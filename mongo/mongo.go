@@ -6,8 +6,9 @@ import (
 	"log"
 	"os"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
@@ -61,6 +62,9 @@ func SetIncidentData(id string, data types.MongoIncident) (error) {
 			"incident_id": id,
 		},
 		bson.M{
+			"$setOnInsert": bson.M{
+				"_id": primitive.NewObjectID(),
+			},
 			"$set": data,
 		},
 		opts,

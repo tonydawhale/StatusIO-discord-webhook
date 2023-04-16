@@ -2,6 +2,7 @@ package requests
 
 import (
 	"bytes"
+	"errors"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -29,6 +30,10 @@ func SendWebhookRequest(data types.WebhookRequestPayload) (*types.WebhookRespons
 		return nil, err
 	}
 
+	if resp.StatusCode != 200 {
+		return nil, errors.New("there was an error with the request to discord")
+	}
+
 	var response *types.WebhookResponsePayload
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.Println(err)
@@ -39,7 +44,7 @@ func SendWebhookRequest(data types.WebhookRequestPayload) (*types.WebhookRespons
 }
 
 func UpdateWebhookRequest(data types.WebhookRequestPayload, messageID string) (*types.WebhookResponsePayload, error) {
-	url := os.Getenv("DISCORD_WEBHOOK_URL") + "/" + messageID
+	url := os.Getenv("DISCORD_WEBHOOK_URL") + "/messages/" + messageID
 
 	payload, err := encodePayload(data)
 	if err != nil {
@@ -55,6 +60,11 @@ func UpdateWebhookRequest(data types.WebhookRequestPayload, messageID string) (*
 		log.Println(err)
 		return nil, err
 	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("there was an error with the request to discord")
+	}
+
 	var response *types.WebhookResponsePayload
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.Println(err)
@@ -72,6 +82,10 @@ func FetchStatusIOData() (*types.StatusPageIncidentsResponse, error) {
 	if err != nil {
 		log.Println(err)
 		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("there was an error with the request to status.io")
 	}
 
 	var response *types.StatusPageIncidentsResponse

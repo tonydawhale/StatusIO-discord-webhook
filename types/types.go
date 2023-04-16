@@ -175,7 +175,7 @@ type StatusPageComponentUpdate struct {
 }
 
 type MongoIncident struct {
-	Id 				primitive.ObjectID `json:"_id" bson:"_id"`
+	Id 				primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	MessageID 		string 			   `json:"message_id" bson:"message_id"`
 	IncidentID		string 			   `json:"incident_id" bson:"incident_id"`
 	LastUpdate		int64			   `json:"last_update" bson:"last_update"`

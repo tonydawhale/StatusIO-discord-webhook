@@ -27,7 +27,7 @@ func main() {
 }
 
 func loadEnv() {
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -35,10 +35,10 @@ func loadEnv() {
 	log.Println("Succesfully Loaded .env file")
 }
 
-func updateIncident(incident types.StatusPageIncident, messageID *string) {
+func updateIncident(incident types.StatusPageIncident, messageID string) {
 	embed := utils.EmbedFromIncident(incident)
 
-	if messageID == nil {
+	if messageID == "" {
 		payload := types.WebhookRequestPayload{
 			Username: os.Getenv("DISCORD_WEBHOOK_USERNAME"),
 			AvatarURL: os.Getenv("DISCORD_WEBHOOK_AVATAR_URL"),
@@ -52,14 +52,14 @@ func updateIncident(incident types.StatusPageIncident, messageID *string) {
 			return
 		}
 
-		messageID = &resp.Id
+		messageID = resp.Id
 	} else {
 		payload := types.WebhookRequestPayload{
 			Embeds: []types.DiscordEmbed{
 				embed,
 			},
 		}
-		_, err := requests.UpdateWebhookRequest(payload, *messageID)
+		_, err := requests.UpdateWebhookRequest(payload, messageID)
 		if err != nil {
 			log.Println("Error updating webhook request: " + err.Error())
 			return
@@ -68,7 +68,7 @@ func updateIncident(incident types.StatusPageIncident, messageID *string) {
 	err := mongo.SetIncidentData(incident.Id, types.MongoIncident{
 		IncidentID: incident.Id,
 		LastUpdate: time.Now().Unix(),
-		MessageID: *messageID,
+		MessageID: messageID,
 		Resolved: utils.IsResolvedStatus(incident.Status),
 	})
 
@@ -93,7 +93,8 @@ func check() {
 			}
 
 			log.Println("New Incident: " + incident.Id)
-			updateIncident(incident, nil)
+			updateIncident(incident, "")
+			return
 		}
 
 		var updateTime string
@@ -110,7 +111,7 @@ func check() {
 		}
 		if mongoData.LastUpdate < incidentUpdate.Unix() {
 			log.Println("New Update: " + incident.Id)
-			updateIncident(incident, &mongoData.MessageID)
+			updateIncident(incident, mongoData.MessageID)
 		}
 	}
 }
