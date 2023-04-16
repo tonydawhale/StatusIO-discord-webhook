@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 	"fmt"
+	"strings"
 
 	"StatusIO-discord-webhook/mongo"
 	"StatusIO-discord-webhook/requests"
@@ -31,6 +32,9 @@ func loadEnv() {
 
 	if err != nil {
 		log.Fatal("Error loading .env file")
+	}
+	if strings.Contains(strings.ToLower(os.Getenv("DISCORD_WEBHOOK_USERNAME")), "discord") {
+		log.Fatal("Webhook Username cannot contain discord")
 	}
 	log.Println("Succesfully Loaded .env file")
 }
