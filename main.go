@@ -1,11 +1,11 @@
 package main
 
 import (
-	"os"
-	"log"
-	"time"
 	"fmt"
+	"log"
+	"os"
 	"strings"
+	"time"
 
 	"StatusIO-discord-webhook/mongo"
 	"StatusIO-discord-webhook/requests"
@@ -44,7 +44,7 @@ func updateIncident(incident types.StatusPageIncident, messageID string) {
 
 	if messageID == "" {
 		payload := types.WebhookRequestPayload{
-			Username: os.Getenv("DISCORD_WEBHOOK_USERNAME"),
+			Username:  os.Getenv("DISCORD_WEBHOOK_USERNAME"),
 			AvatarURL: os.Getenv("DISCORD_WEBHOOK_AVATAR_URL"),
 			Embeds: []types.DiscordEmbed{
 				embed,
@@ -72,8 +72,8 @@ func updateIncident(incident types.StatusPageIncident, messageID string) {
 	err := mongo.SetIncidentData(incident.Id, types.MongoIncident{
 		IncidentID: incident.Id,
 		LastUpdate: time.Now().Unix(),
-		MessageID: messageID,
-		Resolved: utils.IsResolvedStatus(incident.Status),
+		MessageID:  messageID,
+		Resolved:   utils.IsResolvedStatus(incident.Status),
 	})
 
 	if err != nil {
